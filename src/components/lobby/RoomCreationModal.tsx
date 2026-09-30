@@ -12,15 +12,27 @@ interface RoomCreationModalProps {
 
 export const RoomCreationModal: React.FC<RoomCreationModalProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
-  const { createRoom } = useGame();
+  const { createRoom, isSocketConnected } = useGame();
 
   const [capacity, setCapacity] = useState<number>(10);
   const [chatEnabled, setChatEnabled] = useState<boolean>(true);
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      setIsCreating(false);
+    }
+  }, [isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isCreating) return;
+    setIsCreating(true);
     createRoom(capacity, chatEnabled);
-    onClose();
+    setTimeout(() => {
+      setIsCreating(false);
+      onClose();
+    }, 600);
   };
 
   return (
@@ -76,8 +88,22 @@ export const RoomCreationModal: React.FC<RoomCreationModalProps> = ({ isOpen, on
           </p>
         </div>
 
-        <Button type="submit" variant="primary" fullWidth size="lg">
-          Create & Open Castle Gates
+        {!isSocketConnected && (
+          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping flex-shrink-0" />
+            <span>Connecting to palace game server. Your room will open as soon as connection is ready.</span>
+          </div>
+        )}
+
+        <Button type="submit" variant="primary" fullWidth size="lg" disabled={isCreating}>
+          {isCreating ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-4 h-4 border-2 border-cream border-t-transparent rounded-full animate-spin" />
+              Opening Castle Gates...
+            </span>
+          ) : (
+            'Create & Open Castle Gates'
+          )}
         </Button>
       </form>
     </Modal>

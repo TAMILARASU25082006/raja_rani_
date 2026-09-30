@@ -50,52 +50,58 @@ export function setupSocketHandlers(io: Server): GameManager {
   });
 
   io.on('connection', (socket: Socket) => {
-    // Authenticate socket handshake or auth message
-    socket.on('authenticate', (data: { token?: string | null; guestId?: string | null; nickname?: string | null }) => {
-      const token = data?.token;
-      const clientGuestId = data?.guestId;
-      const nickname = data?.nickname;
+    // Helper to ensure socket has valid user identity, auto-generating or recovering if missing
+    const ensureUserData = (authData?: { token?: string | null; guestId?: string | null; nickname?: string | null }): SocketUserData => {
+      let userData = socketDataMap.get(socket.id);
+      if (userData) return userData;
 
+      const token = authData?.token;
       if (token) {
         try {
-          const decoded = jwt.verify(token, CONFIG.JWT_SECRET) as { userId: string; nickname: string };
-          socketDataMap.set(socket.id, {
-            userId: decoded.userId,
-            nickname: decoded.nickname,
-            isGuest: false,
-          });
-          socket.emit('auth_success', { userId: decoded.userId, nickname: decoded.nickname, isGuest: false });
-          return;
+          const decoded = jwt.verify(token, CONFIG.JWT_SECRET) as { userId?: string; id?: string; nickname: string };
+          const uId = decoded.userId || decoded.id;
+          if (uId) {
+            userData = {
+              userId: uId,
+              nickname: (decoded.nickname && decoded.nickname.trim()) ? decoded.nickname.trim().slice(0, 20) : 'Courteous Knight',
+              isGuest: false,
+            };
+            socketDataMap.set(socket.id, userData);
+            socket.emit('auth_success', { userId: userData.userId, nickname: userData.nickname, isGuest: false });
+            return userData;
+          }
         } catch {
-          // Do not silently convert an invalid registered-user token into a guest identity
-          socket.emit('auth_error', { message: 'Invalid or expired authentication session.' });
-          return;
+          // Token invalid or expired, gracefully fall through to guest authentication
         }
       }
 
-      // Guest authentication with server-issued / verified stable ID
-      let guestId = clientGuestId && clientGuestId.startsWith('guest_') && clientGuestId.length >= 10
+      const clientGuestId = authData?.guestId;
+      const nickname = authData?.nickname;
+      const guestId = clientGuestId && clientGuestId.startsWith('guest_') && clientGuestId.length >= 10
         ? clientGuestId
         : 'guest_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36).slice(-4);
 
       const guestNick = (nickname && nickname.trim()) ? nickname.trim().slice(0, 20) : 'Guest_' + guestId.slice(-4);
 
-      socketDataMap.set(socket.id, {
+      userData = {
         userId: guestId,
         nickname: guestNick,
         isGuest: true,
-      });
+      };
 
+      socketDataMap.set(socket.id, userData);
       socket.emit('auth_success', { userId: guestId, nickname: guestNick, isGuest: true });
+      return userData;
+    };
+
+    // Authenticate socket handshake or auth message
+    socket.on('authenticate', (data: { token?: string | null; guestId?: string | null; nickname?: string | null }) => {
+      ensureUserData(data);
     });
 
     // Create room
-    socket.on('create_room', (data: { maxCapacity?: number; chatEnabled?: boolean }) => {
-      const userData = socketDataMap.get(socket.id);
-      if (!userData) {
-        socket.emit('action_error', { message: 'Please authenticate before creating a room.' });
-        return;
-      }
+    socket.on('create_room', (data: { maxCapacity?: number; chatEnabled?: boolean; guestId?: string; nickname?: string; token?: string }) => {
+      const userData = socketDataMap.get(socket.id) || ensureUserData(data);
 
       const capacity = data?.maxCapacity ? Math.max(5, Math.min(30, data.maxCapacity)) : 10;
       const chatEnabled = data?.chatEnabled !== false;
@@ -114,14 +120,10 @@ export function setupSocketHandlers(io: Server): GameManager {
     });
 
     // Join room
-    socket.on('join_room', (data: { roomCode: string }) => {
-      const userData = socketDataMap.get(socket.id);
-      if (!userData) {
-        socket.emit('action_error', { message: 'Please authenticate before joining a room.' });
-        return;
-      }
+    socket.on('join_room', (data: { roomCode: string; guestId?: string; nickname?: string; token?: string }) => {
+      const userData = socketDataMap.get(socket.id) || ensureUserData(data);
 
-      const code = data.roomCode ? data.roomCode.toUpperCase().trim() : '';
+      const code = data?.roomCode ? data.roomCode.toUpperCase().trim() : '';
       const room = gameManager.getRoom(code);
       if (!room) {
         socket.emit('action_error', { message: `Room "${code}" does not exist. Check the code and try again.` });

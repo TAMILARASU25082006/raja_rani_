@@ -1,12 +1,14 @@
 import React from 'react';
 import { CrownSvg } from '../svg/CrownSvg';
 import { useAuth } from '../../context/AuthContext';
+import { useGame } from '../../context/GameContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSound } from '../../context/SoundContext';
 import { Volume2, VolumeX, Globe, LogOut, ShieldAlert, Sparkles, Maximize, Minimize } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { user, logout, dbStatus } = useAuth();
+  const { isSocketConnected } = useGame();
   const { language, setLanguage, t } = useLanguage();
   const { isMuted, toggleMute, reducedMotion, toggleReducedMotion } = useSound();
   const [isFullscreen, setIsFullscreen] = React.useState(false);
@@ -33,6 +35,17 @@ export const Navbar: React.FC = () => {
               <span className="text-xs px-2 py-0.5 rounded-full bg-gold/20 text-gold-dark font-sans font-bold border border-gold/30">
                 5-30P
               </span>
+              {isSocketConnected ? (
+                <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 border border-emerald-500/30" title="Connected to palace game server">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Live
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30" title="Connecting to palace game server...">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                  Connecting...
+                </span>
+              )}
             </h1>
           </div>
         </div>

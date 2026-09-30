@@ -196,13 +196,30 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const createRoom = useCallback((maxCapacity: number = 10, chatEnabled: boolean = true) => {
     soundFx.playClick();
-    socket.emit('create_room', { maxCapacity, chatEnabled });
-  }, [socket]);
+    if (!socket.connected) {
+      socket.connect();
+    }
+    socket.emit('create_room', {
+      maxCapacity,
+      chatEnabled,
+      guestId: guestId || user?.id,
+      nickname: user?.nickname,
+      token: token || null,
+    });
+  }, [socket, guestId, user, token]);
 
   const joinRoom = useCallback((roomCode: string) => {
     soundFx.playClick();
-    socket.emit('join_room', { roomCode });
-  }, [socket]);
+    if (!socket.connected) {
+      socket.connect();
+    }
+    socket.emit('join_room', {
+      roomCode: roomCode ? roomCode.toUpperCase().trim() : '',
+      guestId: guestId || user?.id,
+      nickname: user?.nickname,
+      token: token || null,
+    });
+  }, [socket, guestId, user, token]);
 
   const toggleReady = useCallback(() => {
     soundFx.playClick();
