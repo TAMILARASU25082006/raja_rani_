@@ -1,0 +1,44 @@
+RAJA RANI - START THE GAME
+
+Windows (recommended)
+1. Extract the entire ZIP into a new folder.
+2. Install Node.js 22 LTS or newer if it is not already installed.
+3. Double-click START-GAME.cmd.
+4. Allow npm to install dependencies and compile the game.
+5. Your browser opens when the server is ready. Keep the terminal open.
+
+The default address is http://localhost:5000
+The launcher prints the actual address if PORT is changed in .env.
+Do NOT open index.html directly, or run the source through VS Code Live Server.
+Do NOT copy old node_modules or dist folders over this repaired version.
+
+Manual startup (terminal opened in this extracted folder)
+  npm ci
+  npm start
+
+npm start now builds BOTH the frontend and backend before starting.
+The same server serves the website, API and multiplayer connections.
+
+Development
+  npm run dev
+  Open http://localhost:5173 (backend uses port 5000 by default).
+  If you change the backend port for development, update vite.config.ts too.
+
+Database
+MongoDB is needed for account signup, login and saved match results.
+Configure MONGODB_URI in .env for your database.
+Existing Guest Mode works without MongoDB while the game server is running.
+Never share your .env credentials publicly.
+
+Other players
+localhost only opens on the computer running the server.
+On the same Wi-Fi use http://YOUR-COMPUTER-LAN-IP:5000 on each phone,
+subject to your firewall allowing the connection. Generate invitation links
+from that LAN address. Internet play needs deployment to a public server;
+this ZIP does not deploy the game automatically.
+
+If the page still cannot load
+Keep the terminal open and copy any error printed there.
+Open browser developer tools (F12) and check Console for the first error.
+The new startup screen gives instructions when HTML is opened directly,
+JavaScript assets fail to load, or startup takes too long.

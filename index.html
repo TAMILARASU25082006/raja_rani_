@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/crown-favicon.svg" />
+    <link rel="apple-touch-icon" href="/crown-favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#B58A42" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Raja Rani" />
+    <meta name="description" content="Raja Rani (King & Queen) - Royal Indian Multiplayer Deduction Game for 5 to 30 players" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Raja Rani 🤴👸 | Royal Multiplayer Game</title>
+  </head>
+  <body class="bg-beige text-royal-brown selection:bg-coral-reef selection:text-cream min-h-screen">
+    <div id="root"><main style="min-height:100vh;box-sizing:border-box;display:grid;place-content:center;padding:24px;background:#F5EBDD;color:#352820;font:18px system-ui;text-align:center"><h1>Raja Rani</h1><p id="boot-message">Opening the palace…</p><p id="boot-help" style="max-width:540px;font-size:15px">Please wait while the game loads.</p></main></div>
+    <noscript><p style="padding:24px">Enable JavaScript to play Raja Rani.</p></noscript>
+    <script>
+      (function () {
+        function message(title, help) {
+          var heading = document.getElementById('boot-message');
+          var detail = document.getElementById('boot-help');
+          if (heading) heading.textContent = title;
+          if (detail) detail.textContent = help;
+        }
+        if (location.protocol === 'file:') {
+          message('Start the game server first.', 'Extract the ZIP, double-click START-GAME.cmd, and keep its terminal open. Do not double-click index.html. The launcher opens the correct website for you.');
+          return;
+        }
+        window.addEventListener('error', function () {
+          message('The game could not finish loading.', 'Run npm start from the extracted project folder, then open the address printed in the terminal. Refresh the page; if it still fails, check the browser console.');
+        }, true);
+        setTimeout(function () {
+          message('The game is taking too long to load.', 'Make sure the terminal is still running. Run npm start and use the printed URL. A plain HTML preview cannot run this game.');
+        }, 15000);
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

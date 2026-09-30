@@ -1,0 +1,17 @@
+{
+  "name": "Raja Rani 🤴👸 Royal Multiplayer Game",
+  "short_name": "Raja Rani",
+  "description": "Indian Royal Multiplayer Deduction Game (5-30 players)",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5EBDD",
+  "theme_color": "#B58A42",
+  "icons": [
+    {
+      "src": "/crown-favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
