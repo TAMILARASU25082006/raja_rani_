@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { Button } from '../common/Button';
-import { Mail, Lock, User, AlertCircle, Sparkles, Database, Users } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, Sparkles, Database, Users, X } from 'lucide-react';
 
 export const AuthCard: React.FC = () => {
   const { login, signup, playAsGuest, dbStatus, pendingInviteCode } = useAuth();
@@ -16,6 +16,14 @@ export const AuthCard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [guestNick, setGuestNick] = useState('');
   const [showGuestForm, setShowGuestForm] = useState(false);
+  const [dismissNotice, setDismissNotice] = useState(false);
+
+  // Auto-switch to guest mode if database is offline so user can play immediately
+  useEffect(() => {
+    if (dbStatus && !dbStatus.isDbConnected) {
+      setShowGuestForm(true);
+    }
+  }, [dbStatus]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,18 +66,35 @@ export const AuthCard: React.FC = () => {
         </div>
       )}
 
-      {dbStatus && !dbStatus.isDbConnected && (
-        <div className="mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex flex-col gap-1.5">
-          <div className="flex items-center gap-2 font-bold text-amber-800">
+      {dbStatus && !dbStatus.isDbConnected && !dismissNotice && (
+        <div className="mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex flex-col gap-2 relative animate-fade-in">
+          <button
+            type="button"
+            onClick={() => setDismissNotice(true)}
+            className="absolute top-2.5 right-2.5 p-1 text-amber-700 hover:text-amber-900 rounded-lg hover:bg-amber-100 transition-colors"
+            title="Dismiss notice"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <div className="flex items-center gap-2 font-bold text-amber-800 pr-6">
             <Database className="w-4 h-4 text-amber-700 flex-shrink-0" />
-            <span>MongoDB Offline Notice</span>
+            <span>MongoDB Offline (Guest Mode Active)</span>
           </div>
           <p className="text-amber-800/90 leading-relaxed">
-            {dbStatus.message}
+            Local MongoDB is not running, but you can play multiplayer instantly without an account.
           </p>
-          <p className="text-amber-900 font-medium">
-            💡 You can still play instantly using <strong>Guest Mode</strong> below while you set up MongoDB.
-          </p>
+          <div className="flex items-center gap-2 pt-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                setShowGuestForm(true);
+                setDismissNotice(true);
+              }}
+              className="px-3 py-1.5 bg-gold hover:bg-gold-dark text-white rounded-lg font-bold text-xs shadow-sm transition-all"
+            >
+              👑 Play as Guest Now
+            </button>
+          </div>
         </div>
       )}
 

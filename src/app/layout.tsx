@@ -1,21 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Cinzel, Outfit } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
-
-const cinzel = Cinzel({
-  subsets: ['latin'],
-  weight: ['500', '600', '700', '800', '900'],
-  variable: '--font-cinzel',
-  display: 'swap',
-});
-
-const outfit = Outfit({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  variable: '--font-outfit',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'Raja Rani 🤴👸 | Royal Multiplayer Game',
@@ -47,7 +32,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${cinzel.variable} ${outfit.variable}`}>
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="bg-beige text-royal-brown selection:bg-coral-reef selection:text-cream min-h-screen">
         <Providers>
           {children}
