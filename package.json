@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "node --watch-path=server --import tsx server/index.ts",
     "dev:next": "next dev",
+    "tunnel": "npx localtunnel --port 5000",
     "build": "npm run build:client && npm run build:server",
     "build:client": "next build",
     "build:server": "tsc -p tsconfig.server.json",
