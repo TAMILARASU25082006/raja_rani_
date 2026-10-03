@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { RoomPublicState, RoleInfo, ChatMessage } from '../types/game';
 import { getSocket } from '../services/socket';

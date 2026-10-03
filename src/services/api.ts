@@ -1,6 +1,10 @@
 import { UserProfile } from '../types/game';
 
-const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '') + '/api';
+const getApiBase = (): string => {
+  const envUrl = typeof process !== 'undefined' ? process.env?.NEXT_PUBLIC_API_URL : '';
+  return (envUrl || '').replace(/\/+$/, '') + '/api';
+};
+const API_BASE = getApiBase();
 const DEFAULT_TIMEOUT_MS = 6000;
 
 export interface DbStatusResponse {

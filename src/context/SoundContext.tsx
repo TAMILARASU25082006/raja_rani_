@@ -1,3 +1,5 @@
+'use client';
+
 import { safeStorage } from '../services/storage';
 import React, { createContext, useContext, useState } from 'react';
 import { soundFx } from '../services/soundEffects';

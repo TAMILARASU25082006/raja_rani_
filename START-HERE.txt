@@ -21,8 +21,7 @@ The same server serves the website, API and multiplayer connections.
 
 Development
   npm run dev
-  Open http://localhost:5173 (backend uses port 5000 by default).
-  If you change the backend port for development, update vite.config.ts too.
+  Open http://localhost:5000 (Next.js App Router client, Express API, and Socket.IO all run together on port 5000).
 
 Database
 MongoDB is needed for account signup, login and saved match results.

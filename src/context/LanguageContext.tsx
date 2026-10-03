@@ -1,3 +1,5 @@
+'use client';
+
 import { safeStorage } from '../services/storage';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Language, translations } from '../i18n/translations';

@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import next from 'next';
 import { CONFIG } from './config.js';
 import { connectDB } from './db.js';
 import { authRouter } from './routes/auth.js';
@@ -12,88 +13,95 @@ import { setupSocketHandlers } from './socket/socketHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '..');
 
-const app = express();
-const server = http.createServer(app);
+const isDev = CONFIG.NODE_ENV !== 'production';
+const port = Number(CONFIG.PORT) || 5000;
 
-// Enable CORS
-app.use(
-  cors({
-    origin: '*',
-    credentials: true,
-  })
-);
-
-app.use(express.json());
-
-// Setup Socket.IO
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-  pingTimeout: 30000,
-  pingInterval: 10000,
+// Initialize Next.js app
+const nextFn: any = (next as any).default || next;
+const nextApp = nextFn({
+  dev: isDev,
+  hostname: '0.0.0.0',
+  port,
+  dir: projectRoot,
 });
+const handle = nextApp.getRequestHandler();
 
-// Initialize Socket handlers and GameManager
-setupSocketHandlers(io);
-
-// API Routes
-app.use('/api/auth', authRouter);
-app.use('/api/matches', matchesRouter);
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    service: 'Raja Rani Royal Game Server',
-  });
-});
-
-// In production, serve the built Vite React frontend
-const clientDistPath = path.resolve(__dirname, '../dist');
-app.use(express.static(clientDistPath));
-
-app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
-    return next();
-  }
-  res.sendFile(path.join(clientDistPath, 'index.html'), (err) => {
-    if (err) {
-      res.status(200).send(`
-        <!DOCTYPE html>
-        <html>
-          <head><title>Raja Rani Server</title></head>
-          <body style="font-family:sans-serif;background:#F5EBDD;color:#352820;padding:40px;text-align:center;">
-            <h1>🤴 Raja Rani Game Server 👸</h1>
-            <p>Backend is running on port ${CONFIG.PORT}. In development mode, run <code>npm run dev:client</code> to launch the Vite frontend.</p>
-          </body>
-        </html>
-      `);
-    }
-  });
-});
-
-// Start DB connection and HTTP server
 async function startServer() {
-  void connectDB();
+  try {
+    // Prepare Next.js (compiles in dev, loads build cache in prod)
+    console.log(`⏳ Initializing Next.js in ${isDev ? 'development' : 'production'} mode...`);
+    await nextApp.prepare();
 
-  server.on('error', (error: NodeJS.ErrnoException) => {
-    console.error(error.code === 'EADDRINUSE' ? `Port ${CONFIG.PORT} is already in use. Close the other game terminal or change PORT in .env.` : error.message);
-    process.exitCode = 1;
+    const app = express();
+    const server = http.createServer(app);
+
+    // Enable CORS
+    app.use(
+      cors({
+        origin: '*',
+        credentials: true,
+      })
+    );
+
+    app.use(express.json());
+
+    // Setup Socket.IO
+    const io = new Server(server, {
+      cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+      },
+      pingTimeout: 30000,
+      pingInterval: 10000,
+    });
+
+    // Initialize Socket handlers and GameManager
+    setupSocketHandlers(io);
+
+    // Express API Routes
+    app.use('/api/auth', authRouter);
+    app.use('/api/matches', matchesRouter);
+
+    // Health check
+    app.get('/api/health', (req, res) => {
+      res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        service: 'Raja Rani Royal Game Server (Next.js App Router)',
+      });
+    });
+
+    // Next.js handles all page routes, static assets, and client bundles
+    app.all('*', (req, res) => {
+      return handle(req, res);
+    });
+
+    // Connect DB
+    void connectDB();
+
+    server.on('error', (error: NodeJS.ErrnoException) => {
+      console.error(
+        error.code === 'EADDRINUSE'
+          ? `Port ${port} is already in use. Close the other game terminal or change PORT in .env.`
+          : error.message
+      );
+      process.exit(1);
+    });
+
+    server.listen(port, () => {
+      console.log(`=========================================`);
+      console.log(`🏰 Raja Rani Game Server is LIVE (Next.js)`);
+      console.log(`📡 Port: ${port}`);
+      console.log(`👑 Mode: ${CONFIG.NODE_ENV}`);
+      console.log(`🔗 Local URL: http://localhost:${port}`);
+      console.log(`=========================================`);
+    });
+  } catch (err) {
+    console.error('Failed to start Next.js game server:', err);
     process.exit(1);
-  });
-
-  server.listen(CONFIG.PORT, () => {
-    console.log(`=========================================`);
-    console.log(`🏰 Raja Rani Game Server is LIVE`);
-    console.log(`📡 Port: ${CONFIG.PORT}`);
-    console.log(`👑 Mode: ${CONFIG.NODE_ENV}`);
-    console.log(`🔗 Local URL: http://localhost:${CONFIG.PORT}`);
-    console.log(`=========================================`);
-  });
+  }
 }
 
 startServer();
