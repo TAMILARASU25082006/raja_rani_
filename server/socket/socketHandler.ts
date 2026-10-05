@@ -103,7 +103,7 @@ export function setupSocketHandlers(io: Server): GameManager {
     socket.on('create_room', (data: { maxCapacity?: number; chatEnabled?: boolean; guestId?: string; nickname?: string; token?: string }) => {
       const userData = socketDataMap.get(socket.id) || ensureUserData(data);
 
-      const capacity = data?.maxCapacity ? Math.max(5, Math.min(30, data.maxCapacity)) : 10;
+      const capacity = data?.maxCapacity ? Math.max(3, Math.min(30, data.maxCapacity)) : 10;
       const chatEnabled = data?.chatEnabled !== false;
 
       const room = gameManager.createRoom(userData.userId, capacity, chatEnabled);

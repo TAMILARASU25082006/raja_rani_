@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
 import { SoldierSvg } from '../svg/SoldierSvg';
-import { useSound } from '../../context/SoundContext';
+import { useSound } from '@/hooks/useSound';
 
 export const PatrollingSoldiers: React.FC = () => {
   const { reducedMotion } = useSound();

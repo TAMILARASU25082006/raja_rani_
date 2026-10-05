@@ -1,8 +1,10 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Modal } from '../common/Modal';
-import { Button } from '../common/Button';
-import { useLanguage } from '../../context/LanguageContext';
-import { useGame } from '../../context/GameContext';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { useLanguage } from '@/hooks/useLanguage';
+import { useGame } from '@/hooks/useGame';
 import { KeyRound, Sparkles } from 'lucide-react';
 
 interface JoinRoomModalProps {

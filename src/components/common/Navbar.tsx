@@ -1,19 +1,23 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
 import { CrownSvg } from '../svg/CrownSvg';
-import { useAuth } from '../../context/AuthContext';
-import { useGame } from '../../context/GameContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { useSound } from '../../context/SoundContext';
-import { Volume2, VolumeX, Globe, LogOut, ShieldAlert, Sparkles, Maximize, Minimize } from 'lucide-react';
+import { useGame } from '@/hooks/useGame';
+import { useLanguage } from '@/hooks/useLanguage';
+import { useSound } from '@/hooks/useSound';
+import { Volume2, VolumeX, Globe, Sparkles, Maximize, Minimize, User, Edit3, X, Check } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { user, logout, dbStatus } = useAuth();
-  const { isSocketConnected } = useGame();
+  const { isSocketConnected, user, setNickname, roomState, leaveRoom } = useGame();
   const { language, setLanguage, t } = useLanguage();
   const { isMuted, toggleMute, reducedMotion, toggleReducedMotion } = useSound();
-  const [isFullscreen, setIsFullscreen] = React.useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isEditingNick, setIsEditingNick] = useState(false);
+  const [tempNick, setTempNick] = useState(user?.nickname || '');
 
   const toggleFullscreen = () => {
+    if (typeof document === 'undefined') return;
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
     } else {
@@ -21,48 +25,59 @@ export const Navbar: React.FC = () => {
     }
   };
 
+  const handleSaveNick = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tempNick.trim()) return;
+    setNickname(tempNick.trim());
+    setIsEditingNick(false);
+  };
+
   return (
     <header className="w-full bg-cream/95 backdrop-blur-md border-b border-sand shadow-sm sticky top-0 z-40 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand Logo & Title */}
-        <div className="flex items-center space-x-3">
-          <div className="bg-gold/15 p-2 rounded-xl border border-gold/30 flex items-center justify-center">
+        <Link
+          href="/"
+          onClick={(e) => {
+            if (roomState) {
+              e.preventDefault();
+              leaveRoom();
+            }
+          }}
+          className="flex items-center space-x-3 group"
+        >
+          <div className="bg-gold/15 p-2 rounded-xl border border-gold/30 flex items-center justify-center group-hover:scale-105 transition-transform">
             <CrownSvg size="sm" />
           </div>
           <div>
             <h1 className="font-serif font-black text-lg sm:text-xl text-royal-brown tracking-wide flex items-center gap-1.5">
               <span>{t.appTitle}</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-gold/20 text-gold-dark font-sans font-bold border border-gold/30">
-                5-30P
+                3-30P
               </span>
               {isSocketConnected ? (
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 border border-emerald-500/30" title="Connected to palace game server">
+                <span
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 border border-emerald-500/30"
+                  title="Connected to palace game server"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   Live
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30" title="Connecting to palace game server...">
+                <span
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 border border-amber-500/30"
+                  title="Connecting to palace game server..."
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
                   Connecting...
                 </span>
               )}
             </h1>
           </div>
-        </div>
+        </Link>
 
         {/* Global Controls & User Status */}
         <div className="flex items-center space-x-2 sm:space-x-3">
-          {/* Database Alert Icon if disconnected */}
-          {dbStatus && !dbStatus.isDbConnected && (
-            <div
-              title={dbStatus.message}
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 border border-amber-300 text-xs font-medium cursor-help"
-            >
-              <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
-              <span>DB Setup Notice</span>
-            </div>
-          )}
-
           {/* Reduced Motion Toggle */}
           <button
             onClick={toggleReducedMotion}
@@ -86,11 +101,11 @@ export const Navbar: React.FC = () => {
             {isMuted ? <VolumeX className="w-4 h-4 text-coral-deep" /> : <Volume2 className="w-4 h-4 text-gold-dark" />}
           </button>
 
-          {/* Fullscreen Mobile Game Toggle */}
+          {/* Fullscreen Game Mode Toggle */}
           <button
             onClick={toggleFullscreen}
             className="p-2 rounded-xl bg-beige/60 hover:bg-beige text-royal-brown border border-sand transition-all"
-            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen (App Mode)'}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           >
             {isFullscreen ? <Minimize className="w-4 h-4 text-gold-dark" /> : <Maximize className="w-4 h-4 text-gold-dark" />}
           </button>
@@ -105,31 +120,44 @@ export const Navbar: React.FC = () => {
             <span>{language === 'en' ? 'தமிழ்' : 'English'}</span>
           </button>
 
-          {/* User Profile & Logout */}
-          {user && (
-            <div className="flex items-center space-x-2 pl-2 border-l border-sand">
-              <div className="hidden sm:block text-right">
-                <div className="text-xs font-bold text-royal-brown truncate max-w-[120px]">
-                  {user.nickname}
-                </div>
-                {user.email ? (
-                  <div className="text-[10px] text-royal-muted truncate max-w-[120px]">
-                    {user.email}
-                  </div>
-                ) : (
-                  <div className="text-[10px] text-coral-deep font-semibold">
-                    Guest
-                  </div>
-                )}
-              </div>
-
-              <button
-                onClick={logout}
-                className="p-2 rounded-xl bg-coral-reef/15 hover:bg-coral-reef/25 text-coral-deep border border-coral-reef/30 transition-all"
-                title={t.logout}
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+          {/* Player Nickname Display & Edit */}
+          {user?.nickname && (
+            <div className="flex items-center pl-2 border-l border-sand">
+              {isEditingNick ? (
+                <form onSubmit={handleSaveNick} className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    value={tempNick}
+                    onChange={(e) => setTempNick(e.target.value)}
+                    maxLength={20}
+                    autoFocus
+                    className="w-28 px-2 py-1 bg-white border border-gold rounded-lg text-xs font-bold text-royal-brown focus:outline-none"
+                  />
+                  <button type="submit" className="p-1 text-emerald-700 hover:bg-emerald-50 rounded">
+                    <Check className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingNick(false)}
+                    className="p-1 text-royal-muted hover:bg-beige rounded"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              ) : (
+                <button
+                  onClick={() => {
+                    setTempNick(user.nickname);
+                    setIsEditingNick(true);
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gold/10 hover:bg-gold/20 text-royal-brown border border-gold/30 text-xs font-bold transition-all"
+                  title="Click to rename your royal identity"
+                >
+                  <User className="w-3.5 h-3.5 text-gold-dark" />
+                  <span className="truncate max-w-[100px]">{user.nickname}</span>
+                  <Edit3 className="w-3 h-3 text-royal-muted" />
+                </button>
+              )}
             </div>
           )}
         </div>

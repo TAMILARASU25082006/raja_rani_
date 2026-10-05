@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
-import { useGame } from '../../context/GameContext';
-import { useLanguage } from '../../context/LanguageContext';
+import { useGame } from '@/hooks/useGame';
+import { useLanguage } from '@/hooks/useLanguage';
 import { ShieldCheck, Crosshair, AlertCircle } from 'lucide-react';
 
 export const PoliceRevealBanner: React.FC = () => {
@@ -10,9 +12,10 @@ export const PoliceRevealBanner: React.FC = () => {
   if (!roomState) return null;
 
   const policeSeatIndex = roomState.policePlayerSeat;
-  const policeSeat = policeSeatIndex !== undefined && policeSeatIndex !== null
-    ? roomState.seats[policeSeatIndex]
-    : null;
+  const policeSeat =
+    policeSeatIndex !== undefined && policeSeatIndex !== null
+      ? roomState.seats[policeSeatIndex]
+      : null;
 
   const isMePolice = myPrivateRole?.name === 'Police';
 

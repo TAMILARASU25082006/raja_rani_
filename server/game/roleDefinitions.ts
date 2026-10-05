@@ -344,7 +344,27 @@ export const ALL_ROLES: RoleDefinition[] = [
 ];
 
 export function getRolesForPlayerCount(count: number): RoleDefinition[] {
-  const safeCount = Math.max(5, Math.min(30, count));
+  const safeCount = Math.max(3, Math.min(30, count));
+
+  if (safeCount === 3) {
+    // 3 Players: King, Police, Thief
+    return [
+      ALL_ROLES[0], // King (10,000 pts)
+      ALL_ROLES[3], // Police (1,000 pts)
+      ALL_ROLES[4], // Thief (0 pts)
+    ];
+  }
+
+  if (safeCount === 4) {
+    // 4 Players: King, Queen, Police, Thief
+    return [
+      ALL_ROLES[0], // King (10,000 pts)
+      ALL_ROLES[1], // Queen (9,000 pts)
+      ALL_ROLES[3], // Police (1,000 pts)
+      ALL_ROLES[4], // Thief (0 pts)
+    ];
+  }
+
   return ALL_ROLES.slice(0, safeCount);
 }
 

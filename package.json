@@ -3,19 +3,14 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Raja Rani - Indian Royal Multiplayer Deduction Game (5-30 players)",
-  "main": "server/index.ts",
+  "main": "server.ts",
   "scripts": {
-    "dev": "node --watch-path=server --import tsx server/index.ts",
-    "dev:next": "next dev",
-    "tunnel": "npx localtunnel --port 5000",
-    "build": "npm run build:client && npm run build:server",
-    "build:client": "next build",
-    "build:server": "tsc -p tsconfig.server.json",
-    "start": "node scripts/start.mjs",
-    "start:server": "node dist-server/index.js",
-    "lint": "next lint",
-    "preview": "npm start",
-    "prestart": "npm run build"
+    "dev": "node --import tsx server.ts",
+    "build": "next build",
+    "start": "node --import tsx server.ts",
+    "tunnel": "cloudflared.exe tunnel --url http://localhost:5000",
+    "test": "npx tsx --test tests/game-rules.test.ts tests/multiplayer.test.ts",
+    "lint": "next lint"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

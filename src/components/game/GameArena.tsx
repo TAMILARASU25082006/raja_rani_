@@ -1,7 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useGame } from '../../context/GameContext';
-import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
+import { useGame } from '@/hooks/useGame';
+import { useLanguage } from '@/hooks/useLanguage';
 import { MatchHeader } from './MatchHeader';
 import { PrivateRoleCard } from './PrivateRoleCard';
 import { PoliceRevealBanner } from './PoliceRevealBanner';
@@ -20,8 +21,8 @@ export const GameArena: React.FC = () => {
     myPrivateRole,
     selectedSuspectSeat,
     setSelectedSuspectSeat,
+    user,
   } = useGame();
-  const { user } = useAuth();
   const { t } = useLanguage();
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -59,6 +60,7 @@ export const GameArena: React.FC = () => {
 
       {currentPhase === 'POLICE_REVEAL' && <PoliceRevealBanner />}
 
+      {/* Responsive layout: 2 cols on mobile with chat below, side by side on desktop */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between px-1">
@@ -98,7 +100,7 @@ export const GameArena: React.FC = () => {
           {viewMode === 'grid' ? (
             <SeatingGrid
               seats={roomState.seats}
-              currentUserId={user?.id || ''}
+              currentUserId={user?.userId || ''}
               isAccusationPhase={currentPhase === 'ACCUSATION'}
               policeUserId={policeUserId}
               selectedSuspectSeat={selectedSuspectSeat}
@@ -107,7 +109,7 @@ export const GameArena: React.FC = () => {
           ) : (
             <PlayerListView
               seats={roomState.seats}
-              currentUserId={user?.id || ''}
+              currentUserId={user?.userId || ''}
               isAccusationPhase={currentPhase === 'ACCUSATION'}
               policeUserId={policeUserId}
               selectedSuspectSeat={selectedSuspectSeat}

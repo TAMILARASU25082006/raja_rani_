@@ -24,14 +24,15 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*",
     ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "server",
     "dist",
-    "dist-server"
+    "dist-server",
+    "tests",
+    "vite.config.ts"
   ]
 }

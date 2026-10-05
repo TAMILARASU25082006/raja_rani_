@@ -55,7 +55,7 @@ export class Room {
   ) {
     this.code = code;
     this.ownerUserId = ownerUserId;
-    this.maxCapacity = Math.max(5, Math.min(30, maxCapacity));
+    this.maxCapacity = Math.max(3, Math.min(30, maxCapacity));
     this.chatEnabled = chatEnabled;
     this.createdAt = Date.now();
     this.lastActiveAt = Date.now();
@@ -222,7 +222,7 @@ export class Room {
     const connected = this.seats.filter(
       (s): s is PlayerSeat => s !== null && s.isConnected
     );
-    if (connected.length < 5) return false;
+    if (connected.length < 3) return false;
     return connected.every((s) => s.isReady);
   }
 
@@ -231,7 +231,7 @@ export class Room {
       return { success: false, message: 'Only the room owner can start the match.' };
     }
     if (!this.canStartMatch()) {
-      return { success: false, message: 'Need at least 5 players and all must be ready to start.' };
+      return { success: false, message: 'Need at least 3 players and all must be ready to start.' };
     }
 
     const occupiedSeats = this.seats.filter((s): s is PlayerSeat => s !== null && s.isConnected);

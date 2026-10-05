@@ -28,3 +28,8 @@ dist-ssr
 # Environment
 .env
 .env.production
+.tunnel_url
+
+# Binaries & tunnel utilities
+*.exe
+cloudflared.exe

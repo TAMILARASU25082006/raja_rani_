@@ -16,6 +16,7 @@ export interface RoleInfo {
   description?: string;
   tamilDescription?: string;
   hasCrown: boolean;
+  isSpecial?: boolean;
   category?: 'royalty' | 'enforcer' | 'court' | 'military' | 'artisan' | 'citizen';
 }
 
@@ -57,12 +58,15 @@ export interface RoomPublicState {
   maxCapacity: number;
   chatEnabled: boolean;
   phase: GamePhase;
+  phaseDeadline?: number;
   phaseTimeRemaining: number;
   phaseDuration: number;
+  overallMatchDeadline?: number;
   overallMatchTimeRemaining: number;
   seats: (PublicSeatInfo | null)[];
   policePlayerSeat?: number;
   kingPlayerSeat?: number;
+  queenPlayerSeat?: number;
   accusationResult?: AccusationResult;
   allRolesRevealed: boolean;
   canStart: boolean;
@@ -71,8 +75,20 @@ export interface RoomPublicState {
 export interface UserProfile {
   id: string;
   nickname: string;
-  email: string;
-  gamesPlayed: number;
-  totalScore: number;
-  wins: number;
+  email?: string;
+  gamesPlayed?: number;
+  totalScore?: number;
+  wins?: number;
+}
+
+export type TargetedEffectType = 'gunshot' | 'grenade' | 'neutral';
+
+export interface TargetedEffectPayload {
+  effectType: TargetedEffectType;
+}
+
+export interface AuthSuccessPayload {
+  userId: string;
+  nickname: string;
+  sessionToken: string;
 }

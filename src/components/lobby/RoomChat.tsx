@@ -1,12 +1,12 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
-import { useGame } from '../../context/GameContext';
-import { useAuth } from '../../context/AuthContext';
-import { useLanguage } from '../../context/LanguageContext';
+import { useGame } from '@/hooks/useGame';
+import { useLanguage } from '@/hooks/useLanguage';
 import { MessageSquare, Send, ShieldAlert } from 'lucide-react';
 
 export const RoomChat: React.FC = () => {
-  const { chatMessages, sendChat, roomState } = useGame();
-  const { user } = useAuth();
+  const { chatMessages, sendChat, roomState, user } = useGame();
   const { t } = useLanguage();
 
   const [input, setInput] = useState('');
@@ -49,7 +49,7 @@ export const RoomChat: React.FC = () => {
           </div>
         ) : (
           chatMessages.map((msg) => {
-            const isMe = user && msg.senderUserId === user.id;
+            const isMe = user && msg.senderUserId === user.userId;
 
             if (msg.isSystem) {
               return (

@@ -1,9 +1,11 @@
+'use client';
+
 import React, { useState } from 'react';
-import { RoleInfo } from '../../types/game';
-import { useLanguage } from '../../context/LanguageContext';
+import { RoleInfo } from '@/types/game';
+import { useLanguage } from '@/hooks/useLanguage';
 import { RoleIcon } from '../svg/RoleIcons';
 import { CrownSvg } from '../svg/CrownSvg';
-import { Eye, Sparkles, Shield, Award } from 'lucide-react';
+import { Sparkles, Shield, Award } from 'lucide-react';
 
 interface PrivateRoleCardProps {
   role: RoleInfo | null;
@@ -17,7 +19,7 @@ export const PrivateRoleCard: React.FC<PrivateRoleCardProps> = ({ role }) => {
     return (
       <div className="bg-cream rounded-2xl border-2 border-sand p-6 text-center text-royal-muted animate-pulse">
         <Sparkles className="w-8 h-8 text-gold mx-auto mb-2" />
-        <p className="text-sm font-semibold">Deciphering royal royal decree from the King...</p>
+        <p className="text-sm font-semibold">Deciphering royal decree from the King...</p>
       </div>
     );
   }

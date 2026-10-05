@@ -1,8 +1,10 @@
+'use client';
+
 import React from 'react';
-import { useGame } from '../../context/GameContext';
-import { useLanguage } from '../../context/LanguageContext';
-import { PublicSeatInfo } from '../../types/game';
-import { Button } from '../common/Button';
+import { useGame } from '@/hooks/useGame';
+import { useLanguage } from '@/hooks/useLanguage';
+import { PublicSeatInfo } from '@/types/game';
+import { Button } from '@/components/ui/Button';
 import { RoleIcon } from '../svg/RoleIcons';
 import { CrownSvg } from '../svg/CrownSvg';
 import { AvatarSvg } from '../svg/AvatarSvg';

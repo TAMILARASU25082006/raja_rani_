@@ -1,7 +1,9 @@
+'use client';
+
 import React from 'react';
-import { useGame } from '../../context/GameContext';
-import { useSound } from '../../context/SoundContext';
-import { useLanguage } from '../../context/LanguageContext';
+import { useGame } from '@/hooks/useGame';
+import { useSound } from '@/hooks/useSound';
+import { useLanguage } from '@/hooks/useLanguage';
 import { GunSvg, GrenadeSvg, CrackedGlassSvg } from '../svg/EffectSvgs';
 import { Crosshair } from 'lucide-react';
 

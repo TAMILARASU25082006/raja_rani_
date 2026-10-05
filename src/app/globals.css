@@ -1,1 +1,77 @@
-@import '../index.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    background-color: #F5EBDD;
+    color: #352820;
+    font-family: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Allow text selection in inputs and messages */
+  input, textarea, [contenteditable="true"] {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  button:active, [role="button"]:active {
+    transform: scale(0.98);
+    transition: transform 0.05s ease-in-out;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: 'Cinzel', Georgia, serif;
+  }
+}
+
+/* Custom Royal Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5EBDD;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8C3A5;
+  border-radius: 4px;
+  border: 2px solid #F5EBDD;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B58A42;
+}
+
+/* Perspective for 3D Card Flips */
+.perspective {
+  perspective: 1000px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

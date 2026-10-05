@@ -1,22 +1,19 @@
 'use client';
 
 import React from 'react';
-import { ErrorBoundary } from '../components/common/ErrorBoundary';
-import { LanguageProvider } from '../context/LanguageContext';
-import { SoundProvider } from '../context/SoundContext';
-import { AuthProvider } from '../context/AuthContext';
-import { GameProvider } from '../context/GameContext';
+import { LanguageProvider } from '@/providers/LanguageProvider';
+import { SoundProvider } from '@/providers/SoundProvider';
+import { GameProvider } from '@/providers/GameProvider';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
       <LanguageProvider>
         <SoundProvider>
-          <AuthProvider>
-            <GameProvider>
-              {children}
-            </GameProvider>
-          </AuthProvider>
+          <GameProvider>
+            {children}
+          </GameProvider>
         </SoundProvider>
       </LanguageProvider>
     </ErrorBoundary>
