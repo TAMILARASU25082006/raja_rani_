@@ -20,6 +20,7 @@ import {
   Users,
   ShieldCheck,
   Crown,
+  KeyRound,
 } from 'lucide-react';
 
 export const CastleLobby: React.FC = () => {
@@ -27,6 +28,7 @@ export const CastleLobby: React.FC = () => {
   const { t } = useLanguage();
 
   const [copied, setCopied] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [publicTunnelUrl, setPublicTunnelUrl] = useState<string>('');
 
@@ -55,6 +57,22 @@ export const CastleLobby: React.FC = () => {
   const effectiveBaseUrl = isLocalHost && publicTunnelUrl ? publicTunnelUrl : origin;
   const shareUrl = effectiveBaseUrl ? `${effectiveBaseUrl}/room/${roomState.roomCode}` : '';
 
+  const handleCopyCode = () => {
+    if (!roomState?.roomCode) return;
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(roomState.roomCode);
+    } else {
+      const input = document.createElement('input');
+      input.value = roomState.roomCode;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+    }
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2500);
+  };
+
   const handleCopyLink = () => {
     if (!shareUrl) return;
     if (navigator?.clipboard?.writeText) {
@@ -73,7 +91,7 @@ export const CastleLobby: React.FC = () => {
 
   const handleWhatsAppShare = () => {
     if (!shareUrl) return;
-    const msg = `👑 Join my Raja Rani game!\nTap this single link to enter my room directly and play with me:\n${shareUrl}`;
+    const msg = `👑 Join my Raja Rani game!\nRoom Code: ${roomState.roomCode}\n\nTap this single link to enter my room directly:\n${shareUrl}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -83,7 +101,7 @@ export const CastleLobby: React.FC = () => {
       try {
         await navigator.share({
           title: 'Join Raja Rani Royal Match!',
-          text: `Enter the Palace! Join my Raja Rani game directly with this link:`,
+          text: `Enter the Palace! Room Code: ${roomState.roomCode}\nDirect link:`,
           url: shareUrl,
         });
         return;
@@ -94,70 +112,90 @@ export const CastleLobby: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-      {/* Prominent Single Direct Link Card for Friends */}
-      <div className="bg-gradient-to-r from-amber-500/10 via-gold/20 to-amber-500/10 border-2 border-gold/50 rounded-3xl p-5 sm:p-6 shadow-xl space-y-3.5 animate-fade-in">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gold/25 border border-gold/40 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
-              👑
+      {/* Prominent Joining Code & Direct Link Card for Friends */}
+      <div className="bg-gradient-to-r from-amber-500/10 via-gold/20 to-amber-500/10 border-2 border-gold/50 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4 animate-fade-in">
+        {/* BIG ROOM JOINING CODE DISPLAY */}
+        <div className="bg-white/95 border-2 border-gold/50 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gold/20 border border-gold/40 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
+              🔑
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-serif font-black text-lg sm:text-xl text-royal-brown">
-                  Single Link for Your Friends
-                </h3>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Instant Join
+                <span className="text-[11px] font-black uppercase tracking-wider text-royal-muted">
+                  ROOM JOINING CODE
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                  Give this code to friends
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-royal-muted">
-                Give this single link to your friends anywhere. When they click it on their phone or laptop, they will directly enter this room with you!
+              <p className="text-xs sm:text-sm font-semibold text-royal-brown">
+                Friends can enter this code on the home screen to take a seat in your room!
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-center">
-            <div className="bg-beige/90 border border-sand px-3 py-1.5 rounded-xl flex items-center gap-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-royal-muted">
-                Room Code:
-              </span>
-              <span className="font-mono font-black text-base text-royal-brown tracking-wider">
-                {roomState.roomCode}
-              </span>
+          <div className="flex items-center gap-2.5 w-full md:w-auto justify-center">
+            <div className="bg-beige border-2 border-gold/60 px-5 py-2 rounded-2xl font-mono font-black text-3xl sm:text-4xl text-coral-deep tracking-widest shadow-inner select-all">
+              {roomState.roomCode}
             </div>
+            <Button
+              variant="gold"
+              size="md"
+              onClick={handleCopyCode}
+              className="font-bold flex items-center gap-1.5 px-4 py-2.5 shadow-md flex-shrink-0"
+            >
+              {copiedCode ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4" />}
+              <span>{copiedCode ? 'Code Copied!' : 'Copy Code'}</span>
+            </Button>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              readOnly
-              value={shareUrl}
-              onClick={(e) => (e.target as HTMLInputElement).select()}
-              className="w-full bg-white border-2 border-gold/40 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-mono text-royal-brown select-all font-bold shadow-inner focus:outline-none focus:border-gold"
-            />
+        {/* OR 1-CLICK DIRECT LINK */}
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🔗</span>
+              <span className="text-xs sm:text-sm font-bold text-royal-brown">
+                Or Send 1-Click Direct Join Link (No typing code needed):
+              </span>
+            </div>
+            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Direct Join
+            </span>
           </div>
 
-          <Button
-            variant="gold"
-            size="md"
-            onClick={handleCopyLink}
-            className="flex items-center justify-center gap-2 font-bold px-4 py-2.5 shadow-md flex-shrink-0"
-          >
-            {copied ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'Link Copied!' : 'Copy Single Link'}</span>
-          </Button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+                className="w-full bg-white border-2 border-gold/40 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-mono text-royal-brown select-all font-semibold shadow-inner focus:outline-none focus:border-gold"
+              />
+            </div>
 
-          <button
-            type="button"
-            onClick={handleWhatsAppShare}
-            className="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95 flex-shrink-0 cursor-pointer"
-          >
-            <span className="text-base leading-none">📱</span>
-            <span>Send on WhatsApp</span>
-          </button>
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={handleCopyLink}
+              className="flex items-center justify-center gap-2 font-bold px-4 py-2.5 shadow-sm flex-shrink-0"
+            >
+              {copied ? <Check className="w-4 h-4 text-emerald-700" /> : <Copy className="w-4 h-4 text-gold-dark" />}
+              <span>{copied ? 'Link Copied!' : 'Copy Link'}</span>
+            </Button>
+
+            <button
+              type="button"
+              onClick={handleWhatsAppShare}
+              className="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95 flex-shrink-0 cursor-pointer"
+            >
+              <span className="text-base leading-none">📱</span>
+              <span>Send on WhatsApp</span>
+            </button>
+          </div>
         </div>
       </div>
 

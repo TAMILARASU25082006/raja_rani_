@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/hooks/useGame';
 import { useLanguage } from '@/hooks/useLanguage';
-import { Clock, Hourglass } from 'lucide-react';
+import { Clock, Hourglass, KeyRound } from 'lucide-react';
 
 export const MatchHeader: React.FC = () => {
   const { roomState } = useGame();
@@ -69,6 +69,16 @@ export const MatchHeader: React.FC = () => {
             <div className="text-[10px] font-bold text-royal-muted">{t.timeRemaining}</div>
             <div className="font-mono font-black text-lg text-coral-deep">
               {phaseTimeLeft}s
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 bg-beige/80 px-3.5 py-1.5 rounded-xl border border-sand">
+          <KeyRound className="w-4 h-4 text-gold-dark" />
+          <div>
+            <div className="text-[10px] font-bold text-royal-muted">ROOM CODE</div>
+            <div className="font-mono font-black text-base text-coral-deep tracking-wider">
+              {roomState.roomCode}
             </div>
           </div>
         </div>
