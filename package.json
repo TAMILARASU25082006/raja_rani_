@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "node --import tsx server.ts",
     "tunnel": "cloudflared.exe tunnel --url http://localhost:5000",
+    "online": "concurrently \"npm run dev\" \"npm run tunnel\"",
     "test": "npx tsx --test tests/game-rules.test.ts tests/multiplayer.test.ts",
     "lint": "next lint"
   },

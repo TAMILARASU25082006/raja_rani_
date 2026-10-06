@@ -41,15 +41,21 @@ if not exist node_modules (
   )
 )
 
-echo =========================================
-echo 🏰 Starting Raja Rani Game Server...
-echo 📡 Website URL: http://localhost:5000
-echo =========================================
+if not exist cloudflared.exe (
+  echo Downloading cloudflare tunnel helper for online friends...
+  curl -L -o cloudflared.exe https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe >nul 2>nul
+)
+
+echo =========================================================
+echo 👑 Starting Raja Rani Multiplayer Game Server...
+echo 🌍 Online Tunnel will start automatically!
+echo 💻 Local URL: http://localhost:5000
+echo =========================================================
 
 :: Automatically open browser after server initialization
-start /b cmd /c "timeout /t 3 /nobreak >nul & start http://localhost:5000"
+start /b cmd /c "timeout /t 5 /nobreak >nul & start http://localhost:5000"
 
-call npm run dev
+call npm run online
 if errorlevel 1 (
   echo.
   echo Server stopped or startup failed. Please copy the error shown above.
