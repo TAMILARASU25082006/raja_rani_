@@ -34,7 +34,14 @@ export const CastleLobby: React.FC = () => {
 
   React.useEffect(() => {
     fetch('/api/public-tunnel')
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) return null;
+        try {
+          return await res.json();
+        } catch {
+          return null;
+        }
+      })
       .then((data) => {
         if (data?.success && data?.url) {
           setPublicTunnelUrl(data.url);

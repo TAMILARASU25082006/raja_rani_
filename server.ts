@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import next from 'next';
+import { parse } from 'url';
 import { CONFIG } from './src/lib/server/config';
 import { connectDB } from './src/lib/server/db';
 import { setupSocketHandlers } from './src/server/socket/socketHandler';
@@ -85,7 +86,8 @@ async function startServer() {
 
     // Let Next.js handle all other requests including Route Handlers (like /api/health) and App Router pages
     app.all('*', (req, res) => {
-      return handle(req, res);
+      const parsedUrl = parse(req.url, true);
+      return handle(req, res, parsedUrl);
     });
 
     // Connect to MongoDB in background without blocking server startup
